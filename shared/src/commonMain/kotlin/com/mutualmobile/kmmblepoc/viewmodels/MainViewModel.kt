@@ -17,16 +17,18 @@ class MainViewModel : ViewModel() {
     private val _permissionsFlow: MutableLiveData<Boolean> = MutableLiveData(initialValue = false)
     val permissionsFlow: LiveData<Boolean> = _permissionsFlow
 
-    private val _devicesFlow: MutableLiveData<String> = MutableLiveData("")
-    val devicesFlow: LiveData<String> = _devicesFlow
+    private val _devicesFlow: MutableLiveData<BluetoothPeripheral?> = MutableLiveData(null)
+    val devicesFlow: LiveData<BluetoothPeripheral?> = _devicesFlow
+
+    var blueFalcon: BlueFalcon? = null
 
     fun setPermission(isPermissionGranted: Boolean) {
         _permissionsFlow.postValue(isPermissionGranted)
     }
 
     fun searchDevices(applicationContext: ApplicationContext) {
-        val blueFalcon = BlueFalcon(applicationContext, null)
-        with(blueFalcon) {
+        blueFalcon = BlueFalcon(applicationContext, null)
+        blueFalcon?.apply {
             scan()
             delegates.add(
                 object : BlueFalconDelegate {
@@ -50,7 +52,7 @@ class MainViewModel : ViewModel() {
                     }
 
                     override fun didDiscoverDevice(bluetoothPeripheral: BluetoothPeripheral) {
-                        _devicesFlow.postValue("${bluetoothPeripheral.name} - ${bluetoothPeripheral.uuid}\n")
+                        _devicesFlow.postValue(bluetoothPeripheral)
                     }
 
                     override fun didDiscoverServices(bluetoothPeripheral: BluetoothPeripheral) {
