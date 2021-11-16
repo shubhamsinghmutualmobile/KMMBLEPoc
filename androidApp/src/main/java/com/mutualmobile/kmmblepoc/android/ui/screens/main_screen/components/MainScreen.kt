@@ -24,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.mutualmobile.kmmblepoc.android.R
 import com.mutualmobile.kmmblepoc.viewmodels.MainViewModel
+import com.ramcosta.composedestinations.DetailsScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.bluefalcon.BluetoothPeripheral
@@ -61,7 +63,8 @@ fun MainScreen(
                         ctx // todo: check why this context is needed to display the DeviceCard
                         DeviceCard(
                             device = device,
-                            mainViewModel = mainViewModel
+                            mainViewModel = mainViewModel,
+                            navigator = navigator
                         )
                     }
                 }
@@ -113,11 +116,24 @@ private fun ScreenHeader(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun DeviceCard(
     device: BluetoothPeripheral,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    navigator: DestinationsNavigator
 ) {
+    val currentDevice by mainViewModel.currentSelectedDeviceFlow.asFlow()
+        .collectAsState(initial = null)
+
+    currentDevice?.let {
+        navigator.navigate(DetailsScreenDestination)
+    }
+
+    var isConnecting by remember {
+        mutableStateOf(false)
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -149,18 +165,31 @@ private fun DeviceCard(
             Column(
                 modifier = Modifier.padding(end = 24.dp)
             ) {
-                IconButton(
-                    onClick = { mainViewModel.connectToDevice(device) },
-                    modifier = Modifier.padding(top = 4.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_circle_right_arrow),
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.primary
+                AnimatedVisibility(visible = !isConnecting) {
+                    IconButton(
+                        onClick = {
+                            isConnecting = true
+                            mainViewModel.connectToDevice(device)
+                        },
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_circle_right_arrow),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.primary
+                        )
+                    }
+                }
+                AnimatedVisibility(visible = isConnecting) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(24.dp),
+                        strokeWidth = 1.dp
                     )
                 }
                 Text(
-                    text = "Connect",
+                    text = if (isConnecting) "Connecting..." else "Connect",
                     style = MaterialTheme.typography.subtitle2,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )

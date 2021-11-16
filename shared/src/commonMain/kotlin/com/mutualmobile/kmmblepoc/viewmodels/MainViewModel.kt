@@ -37,17 +37,17 @@ class MainViewModel : ViewModel() {
     fun searchDevices(applicationContext: ApplicationContext) {
         blueFalcon = BlueFalcon(applicationContext, null)
         blueFalcon?.apply {
-            scan()
-            if (isScanning) {
-                _isScanningFlow.postValue(true)
-            }
+            startScanningForDevices()
             delegates.add(
                 object : BlueFalconDelegate {
                     override fun didCharacteristcValueChanged(
                         bluetoothPeripheral: BluetoothPeripheral,
                         bluetoothCharacteristic: BluetoothCharacteristic
                     ) {
-                        Log.d(TAG, "didCharacteristcValueChanged: yes! which device? : ${bluetoothPeripheral.uuid}")
+                        Log.d(
+                            TAG,
+                            "didCharacteristcValueChanged: yes! which device? : ${bluetoothPeripheral.uuid}"
+                        )
                     }
 
                     override fun didConnect(bluetoothPeripheral: BluetoothPeripheral) {
@@ -63,7 +63,10 @@ class MainViewModel : ViewModel() {
                     }
 
                     override fun didDiscoverCharacteristics(bluetoothPeripheral: BluetoothPeripheral) {
-                        Log.d(TAG, "didDiscoverCharacteristics: yes! which device? : ${bluetoothPeripheral.uuid}")
+                        Log.d(
+                            TAG,
+                            "didDiscoverCharacteristics: yes! which device? : ${bluetoothPeripheral.uuid}"
+                        )
                         _currentSelectedDeviceFlow.postValue(bluetoothPeripheral)
                     }
 
@@ -72,7 +75,10 @@ class MainViewModel : ViewModel() {
                     }
 
                     override fun didDiscoverServices(bluetoothPeripheral: BluetoothPeripheral) {
-                        Log.d(TAG, "didDiscoverServices: yes! for which device: ${bluetoothPeripheral.name}")
+                        Log.d(
+                            TAG,
+                            "didDiscoverServices: yes! for which device: ${bluetoothPeripheral.name}"
+                        )
                         _currentSelectedDeviceFlow.postValue(bluetoothPeripheral)
                     }
 
@@ -80,11 +86,17 @@ class MainViewModel : ViewModel() {
                         bluetoothPeripheral: BluetoothPeripheral,
                         bluetoothCharacteristicDescriptor: BluetoothCharacteristicDescriptor
                     ) {
-                        Log.d(TAG, "didReadDescriptor: yes! which device? : ${bluetoothPeripheral.uuid}")
+                        Log.d(
+                            TAG,
+                            "didReadDescriptor: yes! which device? : ${bluetoothPeripheral.uuid}"
+                        )
                     }
 
                     override fun didRssiUpdate(bluetoothPeripheral: BluetoothPeripheral) {
-                        Log.d(TAG, "didRssiUpdate: yes! for which device? : ${bluetoothPeripheral.name}")
+                        Log.d(
+                            TAG,
+                            "didRssiUpdate: yes! for which device? : ${bluetoothPeripheral.name}"
+                        )
                         _currentSelectedDeviceFlow.postValue(bluetoothPeripheral)
                     }
 
@@ -98,11 +110,32 @@ class MainViewModel : ViewModel() {
 
     fun connectToDevice(bluetoothPeripheral: BluetoothPeripheral) {
         blueFalcon?.apply {
-            stopScanning()
+            stopScanningForDevices()
             if (!isScanning) {
-                _isScanningFlow.postValue(false)
                 connect(bluetoothPeripheral = bluetoothPeripheral)
             }
+        }
+    }
+
+    fun disconnectFromDevice(bluetoothPeripheral: BluetoothPeripheral) {
+        blueFalcon?.apply {
+            disconnect(bluetoothPeripheral)
+            _currentSelectedDeviceFlow.postValue(null)
+            startScanningForDevices()
+        }
+    }
+
+    private fun BlueFalcon.startScanningForDevices() {
+        scan()
+        if (isScanning) {
+            _isScanningFlow.postValue(true)
+        }
+    }
+
+    private fun BlueFalcon.stopScanningForDevices() {
+        stopScanning()
+        if (!isScanning) {
+            _isScanningFlow.postValue(false)
         }
     }
 }
