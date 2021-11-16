@@ -32,6 +32,7 @@ kotlin {
             dependencies {
                 implementation("dev.bluefalcon:blue-falcon:0.9.8")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+                implementation("io.insert-koin:koin-core:3.1.3")
             }
         }
         val commonTest by getting {

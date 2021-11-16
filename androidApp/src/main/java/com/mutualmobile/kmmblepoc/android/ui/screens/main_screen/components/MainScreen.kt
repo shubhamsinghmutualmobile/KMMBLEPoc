@@ -31,12 +31,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.mutualmobile.kmmblepoc.android.R
 import com.mutualmobile.kmmblepoc.viewmodels.MainViewModel
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.bluefalcon.BluetoothPeripheral
 import dev.icerock.moko.mvvm.livedata.asFlow
+import org.koin.androidx.compose.get
 
+@Destination(start = true)
 @Composable
 fun MainScreen(
-    mainViewModel: MainViewModel
+    navigator: DestinationsNavigator,
+    mainViewModel: MainViewModel = get()
 ) {
     val ctx = LocalContext.current
     val device by mainViewModel.devicesFlow.asFlow()

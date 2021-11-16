@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     kotlin("android")
+    id("com.google.devtools.ksp") version "1.5.31-1.0.0"
 }
 
 dependencies {
@@ -20,14 +21,26 @@ dependencies {
     implementation("androidx.compose.material:material:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
     debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
+
+    implementation("io.github.raamcosta.compose-destinations:core:0.9.4-beta")
+    ksp("io.github.raamcosta.compose-destinations:ksp:0.9.4-beta")
+
+    // official compose navigation
+    implementation("androidx.navigation:navigation-compose:2.4.0-beta02")
+
+    val koinVersion = "3.1.3"
+    implementation("io.insert-koin:koin-android:$koinVersion")
+//    implementation("io.insert-koin:koin-android-viewmodel:$koinVersion")
+    implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
 }
 
 android {
-    compileSdkVersion(31)
+    compileSdk = 31
+    sourceSets["debug"].java.srcDir(file("build/generated/ksp/debug/kotlin"))
     defaultConfig {
         applicationId = "com.mutualmobile.kmmblepoc.android"
-        minSdkVersion(24)
-        targetSdkVersion(31)
+        minSdk = 24
+        targetSdk = 31
         versionCode = 1
         versionName = "1.0"
     }
@@ -41,7 +54,6 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.0.5"
-        kotlinCompilerVersion = "1.5.21"
     }
     kotlinOptions {
         jvmTarget = "1.8"
