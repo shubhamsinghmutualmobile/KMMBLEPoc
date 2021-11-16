@@ -1,5 +1,7 @@
 package com.mutualmobile.kmmblepoc.android.ui.screens.main_screen.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -47,12 +49,15 @@ fun MainScreen(
     addOrUpdateDevicesInList(device, devices)
     Surface {
         Column(modifier = Modifier.fillMaxSize()) {
-            ScreenHeader()
+            ScreenHeader(mainViewModel = mainViewModel)
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 devices.distinctBy { device -> device.uuid }.forEach { device ->
                     item {
                         ctx // todo: check why this context is needed to display the DeviceCard
-                        DeviceCard(device)
+                        DeviceCard(
+                            device = device,
+                            mainViewModel = mainViewModel
+                        )
                     }
                 }
             }
@@ -74,8 +79,12 @@ private fun addOrUpdateDevicesInList(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun ScreenHeader() {
+private fun ScreenHeader(
+    mainViewModel: MainViewModel
+) {
+    val isScanning by mainViewModel.isScanningFlow.asFlow().collectAsState(initial = false)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,17 +97,22 @@ private fun ScreenHeader() {
             style = MaterialTheme.typography.body1,
             modifier = Modifier.padding(16.dp)
         )
-        CircularProgressIndicator(
-            modifier = Modifier
-                .padding(end = 16.dp)
-                .size(24.dp),
-            strokeWidth = 2.dp
-        )
+        AnimatedVisibility(visible = isScanning) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .size(24.dp),
+                strokeWidth = 2.dp
+            )
+        }
     }
 }
 
 @Composable
-private fun DeviceCard(device: BluetoothPeripheral) {
+private fun DeviceCard(
+    device: BluetoothPeripheral,
+    mainViewModel: MainViewModel
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -130,12 +144,16 @@ private fun DeviceCard(device: BluetoothPeripheral) {
             Column(
                 modifier = Modifier.padding(end = 24.dp)
             ) {
-                IconButton(onClick = {}, modifier = Modifier.padding(top = 4.dp)) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_circle_right_arrow),
-                    contentDescription = null
-                )
-            }
+                IconButton(
+                    onClick = { mainViewModel.connectToDevice(device) },
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_circle_right_arrow),
+                        contentDescription = null,
+                        tint = MaterialTheme.colors.primary
+                    )
+                }
                 Text(
                     text = "Connect",
                     style = MaterialTheme.typography.subtitle2,

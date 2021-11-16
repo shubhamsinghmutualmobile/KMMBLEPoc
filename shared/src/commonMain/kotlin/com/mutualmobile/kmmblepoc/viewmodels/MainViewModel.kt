@@ -1,5 +1,6 @@
 package com.mutualmobile.kmmblepoc.viewmodels
 
+import android.util.Log
 import dev.bluefalcon.ApplicationContext
 import dev.bluefalcon.BlueFalcon
 import dev.bluefalcon.BlueFalconDelegate
@@ -20,6 +21,13 @@ class MainViewModel : ViewModel() {
     private val _devicesFlow: MutableLiveData<BluetoothPeripheral?> = MutableLiveData(null)
     val devicesFlow: LiveData<BluetoothPeripheral?> = _devicesFlow
 
+    private val _isScanningFlow: MutableLiveData<Boolean> = MutableLiveData(initialValue = false)
+    val isScanningFlow: LiveData<Boolean> = _isScanningFlow
+
+    private val _currentSelectedDeviceFlow: MutableLiveData<BluetoothPeripheral?> =
+        MutableLiveData(null)
+    val currentSelectedDeviceFlow: LiveData<BluetoothPeripheral?> = _currentSelectedDeviceFlow
+
     var blueFalcon: BlueFalcon? = null
 
     fun setPermission(isPermissionGranted: Boolean) {
@@ -30,25 +38,33 @@ class MainViewModel : ViewModel() {
         blueFalcon = BlueFalcon(applicationContext, null)
         blueFalcon?.apply {
             scan()
+            if (isScanning) {
+                _isScanningFlow.postValue(true)
+            }
             delegates.add(
                 object : BlueFalconDelegate {
                     override fun didCharacteristcValueChanged(
                         bluetoothPeripheral: BluetoothPeripheral,
                         bluetoothCharacteristic: BluetoothCharacteristic
                     ) {
-                        TODO("Not yet implemented")
+                        Log.d(TAG, "didCharacteristcValueChanged: yes! which device? : ${bluetoothPeripheral.uuid}")
                     }
 
                     override fun didConnect(bluetoothPeripheral: BluetoothPeripheral) {
-                        TODO("Not yet implemented")
+                        Log.d(TAG, "didConnect: yes! which device? : ${bluetoothPeripheral.uuid}")
+                        _currentSelectedDeviceFlow.postValue(bluetoothPeripheral)
                     }
 
                     override fun didDisconnect(bluetoothPeripheral: BluetoothPeripheral) {
-                        TODO("Not yet implemented")
+                        Log.d(
+                            TAG,
+                            "didDisconnect: yes! which device? : ${bluetoothPeripheral.uuid}"
+                        )
                     }
 
                     override fun didDiscoverCharacteristics(bluetoothPeripheral: BluetoothPeripheral) {
-                        TODO("Not yet implemented")
+                        Log.d(TAG, "didDiscoverCharacteristics: yes! which device? : ${bluetoothPeripheral.uuid}")
+                        _currentSelectedDeviceFlow.postValue(bluetoothPeripheral)
                     }
 
                     override fun didDiscoverDevice(bluetoothPeripheral: BluetoothPeripheral) {
@@ -56,25 +72,37 @@ class MainViewModel : ViewModel() {
                     }
 
                     override fun didDiscoverServices(bluetoothPeripheral: BluetoothPeripheral) {
-                        TODO("Not yet implemented")
+                        Log.d(TAG, "didDiscoverServices: yes! for which device: ${bluetoothPeripheral.name}")
+                        _currentSelectedDeviceFlow.postValue(bluetoothPeripheral)
                     }
 
                     override fun didReadDescriptor(
                         bluetoothPeripheral: BluetoothPeripheral,
                         bluetoothCharacteristicDescriptor: BluetoothCharacteristicDescriptor
                     ) {
-                        TODO("Not yet implemented")
+                        Log.d(TAG, "didReadDescriptor: yes! which device? : ${bluetoothPeripheral.uuid}")
                     }
 
                     override fun didRssiUpdate(bluetoothPeripheral: BluetoothPeripheral) {
-                        TODO("Not yet implemented")
+                        Log.d(TAG, "didRssiUpdate: yes! for which device? : ${bluetoothPeripheral.name}")
+                        _currentSelectedDeviceFlow.postValue(bluetoothPeripheral)
                     }
 
                     override fun didUpdateMTU(bluetoothPeripheral: BluetoothPeripheral) {
-                        TODO("Not yet implemented")
+                        Log.d(TAG, "didUpdateMTU: yes! which device? : ${bluetoothPeripheral.uuid}")
                     }
                 }
             )
+        }
+    }
+
+    fun connectToDevice(bluetoothPeripheral: BluetoothPeripheral) {
+        blueFalcon?.apply {
+            stopScanning()
+            if (!isScanning) {
+                _isScanningFlow.postValue(false)
+                connect(bluetoothPeripheral = bluetoothPeripheral)
+            }
         }
     }
 }
