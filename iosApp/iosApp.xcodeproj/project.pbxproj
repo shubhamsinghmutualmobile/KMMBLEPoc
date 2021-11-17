@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
+		89308D472744CB5C00A2675F /* VM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89308D462744CB5C00A2675F /* VM.swift */; };
 		EB35F2A5D1D6CA8BBCC901A3 /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8913E855E2FDD80D6265CD44 /* Pods_iosApp.framework */; };
 /* End PBXBuildFile section */
 
@@ -19,6 +20,7 @@
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8913E855E2FDD80D6265CD44 /* Pods_iosApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iosApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		89308D462744CB5C00A2675F /* VM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VM.swift; sourceTree = "<group>"; };
 		95C13274AA5A70E4AC682CAD /* Pods-iosApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.release.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -40,7 +42,6 @@
 				032FD413A0F904D94F0B9B5F /* Pods-iosApp.debug.xcconfig */,
 				95C13274AA5A70E4AC682CAD /* Pods-iosApp.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -68,6 +69,7 @@
 				7555FF82242A565900829871 /* ContentView.swift */,
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
+				89308D462744CB5C00A2675F /* VM.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -176,6 +178,7 @@
 			files = (
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				89308D472744CB5C00A2675F /* VM.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,6 +1,6 @@
 package com.mutualmobile.kmmblepoc.viewmodels
 
-import android.util.Log
+import com.mutualmobile.kmmblepoc.OnUpdateListener
 import dev.bluefalcon.ApplicationContext
 import dev.bluefalcon.BlueFalcon
 import dev.bluefalcon.BlueFalconDelegate
@@ -11,9 +11,9 @@ import dev.icerock.moko.mvvm.livedata.LiveData
 import dev.icerock.moko.mvvm.livedata.MutableLiveData
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 
-private const val TAG = "MainViewModel"
-
 class MainViewModel : ViewModel() {
+
+    var listener: OnUpdateListener? = null
 
     private val _permissionsFlow: MutableLiveData<Boolean> = MutableLiveData(initialValue = false)
     val permissionsFlow: LiveData<Boolean> = _permissionsFlow
@@ -23,6 +23,9 @@ class MainViewModel : ViewModel() {
 
     private val _isScanningFlow: MutableLiveData<Boolean> = MutableLiveData(initialValue = false)
     val isScanningFlow: LiveData<Boolean> = _isScanningFlow
+
+    private val _characteristicValue: MutableLiveData<String> = MutableLiveData(initialValue = "")
+    val characteristicValue: LiveData<String> = _characteristicValue
 
     private val _currentSelectedDeviceFlow: MutableLiveData<BluetoothPeripheral?> =
         MutableLiveData(null)
@@ -44,41 +47,28 @@ class MainViewModel : ViewModel() {
                         bluetoothPeripheral: BluetoothPeripheral,
                         bluetoothCharacteristic: BluetoothCharacteristic
                     ) {
-                        Log.d(
-                            TAG,
-                            "didCharacteristcValueChanged: yes! which device? : ${bluetoothPeripheral.uuid}"
-                        )
+                        _characteristicValue.postValue(bluetoothCharacteristic.value.toString())
                     }
 
                     override fun didConnect(bluetoothPeripheral: BluetoothPeripheral) {
-                        Log.d(TAG, "didConnect: yes! which device? : ${bluetoothPeripheral.uuid}")
                         _currentSelectedDeviceFlow.postValue(bluetoothPeripheral)
                     }
 
                     override fun didDisconnect(bluetoothPeripheral: BluetoothPeripheral) {
-                        Log.d(
-                            TAG,
-                            "didDisconnect: yes! which device? : ${bluetoothPeripheral.uuid}"
-                        )
                     }
 
                     override fun didDiscoverCharacteristics(bluetoothPeripheral: BluetoothPeripheral) {
-                        Log.d(
-                            TAG,
-                            "didDiscoverCharacteristics: yes! which device? : ${bluetoothPeripheral.uuid}"
-                        )
+
                         _currentSelectedDeviceFlow.postValue(bluetoothPeripheral)
                     }
 
                     override fun didDiscoverDevice(bluetoothPeripheral: BluetoothPeripheral) {
                         _devicesFlow.postValue(bluetoothPeripheral)
+                        listener?.update(_devicesFlow.value)
                     }
 
                     override fun didDiscoverServices(bluetoothPeripheral: BluetoothPeripheral) {
-                        Log.d(
-                            TAG,
-                            "didDiscoverServices: yes! for which device: ${bluetoothPeripheral.name}"
-                        )
+
                         _currentSelectedDeviceFlow.postValue(bluetoothPeripheral)
                     }
 
@@ -86,22 +76,14 @@ class MainViewModel : ViewModel() {
                         bluetoothPeripheral: BluetoothPeripheral,
                         bluetoothCharacteristicDescriptor: BluetoothCharacteristicDescriptor
                     ) {
-                        Log.d(
-                            TAG,
-                            "didReadDescriptor: yes! which device? : ${bluetoothPeripheral.uuid}"
-                        )
                     }
 
                     override fun didRssiUpdate(bluetoothPeripheral: BluetoothPeripheral) {
-                        Log.d(
-                            TAG,
-                            "didRssiUpdate: yes! for which device? : ${bluetoothPeripheral.name}"
-                        )
+
                         _currentSelectedDeviceFlow.postValue(bluetoothPeripheral)
                     }
 
                     override fun didUpdateMTU(bluetoothPeripheral: BluetoothPeripheral) {
-                        Log.d(TAG, "didUpdateMTU: yes! which device? : ${bluetoothPeripheral.uuid}")
                     }
                 }
             )
@@ -137,5 +119,8 @@ class MainViewModel : ViewModel() {
         if (!isScanning) {
             _isScanningFlow.postValue(false)
         }
+    }
+
+    fun readManufacturer() {
     }
 }

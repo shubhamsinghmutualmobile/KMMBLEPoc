@@ -13,5 +13,7 @@ fun initKoin(appDeclaration: KoinAppDeclaration = {}) = startKoin {
 fun initKoin() = initKoin {}
 
 val commonModule = module {
-    single { MainViewModel() }
+    single {
+        MainViewModel()
+    }
 }
